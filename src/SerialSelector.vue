@@ -20,6 +20,8 @@
 import { ref, onMounted, shallowRef } from "vue";
 import SerialPortLineReader from "./serial/line-reader";
 
+const emits = defineEmits(["sensorData"]);
+
 const devicesList = ref([]);
 const devicesInfo = ref([]);
 const selectedDevice = ref(null);
@@ -30,8 +32,10 @@ const isOngoing = ref(false);
 const getDevices = async () => {
   const devices = await navigator.serial.getPorts();
   if (devices) {
-    devicesList.value = devices;
-    devicesInfo.value = devices.map((device) => device.getInfo());
+    devicesList.value = devices.filter(
+      (device) => device.getInfo().usbProductId
+    );
+    devicesInfo.value = devicesList.value.map((device) => device.getInfo());
   } else {
     console.error("No devices found", devices);
   }
@@ -40,7 +44,7 @@ const getDevices = async () => {
 const stopSerial = async () => {
   isOngoing.value = false;
 
-  if (selectedDevice.value !== null) {
+  if (selectedDevice.value != null) {
     const device = devicesList.value[selectedDevice.value];
     await reader.value.releaseLock();
     await device.close();
@@ -50,7 +54,7 @@ const stopSerial = async () => {
 const startSerial = async () => {
   isOngoing.value = true;
 
-  if (selectedDevice.value !== null) {
+  if (selectedDevice.value != null) {
     const device = devicesList.value[selectedDevice.value];
     await device.open({ baudRate: 9600 });
 
@@ -72,7 +76,8 @@ const startSerial = async () => {
 
 onMounted(() => {
   lineReader.value.addListener((line) => {
-    console.log(line);
+    const u12 = Number(line.substring(line.indexOf("U12:") + 4));
+    emits("sensorData", u12);
   });
 
   getDevices();
