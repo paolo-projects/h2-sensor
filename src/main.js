@@ -1,16 +1,11 @@
 import { app, BrowserWindow } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
-import { SerialPort } from "serialport";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
-
-const handleDevicesList = async (event) => {
-  return await SerialPort.list();
-};
 
 const createWindow = () => {
   // Create the browser window.
@@ -20,6 +15,22 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
+  });
+
+  mainWindow.webContents.session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
+    if (permission === 'serial') {
+      return true
+    }
+
+    return false
+  });
+
+  mainWindow.webContents.session.setDevicePermissionHandler((details) => {
+    if (details.deviceType === 'serial') {
+      return true
+    }
+
+    return false
   });
 
   // and load the index.html of the app.
@@ -39,8 +50,6 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  ipcMain.handle("devices-list", handleDevicesList);
-
   createWindow();
 
   // On OS X it's common to re-create a window in the app when the

@@ -1,31 +1,80 @@
 <template>
-  <select v-model="selectedDevice">
+  <select v-model="selectedDevice" :disabled="isOngoing">
     <option
-      v-for="device in devicesList"
-      :key="device.path"
-      :value="device.path"
+      v-for="(device, index) in devicesInfo"
+      :key="device.usbProductId"
+      :value="index"
     >
-      {{ device.path }}
+      0x{{ Number(device.usbVendorId).toString(16) }} - 0x{{
+        Number(device.usbProductId).toString(16)
+      }}
     </option>
   </select>
-  <button @click="getDevices">Refresh</button>
+  <button @click="getDevices" :disabled="isOngoing">Refresh</button>
+  <button @click="isOngoing ? stopSerial() : startSerial()">
+    {{ isOngoing ? "Stop" : "Start" }}
+  </button>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, shallowRef } from "vue";
+import SerialPortLineReader from "./serial/line-reader";
 
 const devicesList = ref([]);
+const devicesInfo = ref([]);
+const selectedDevice = ref(null);
+const reader = shallowRef(null);
+const lineReader = shallowRef(new SerialPortLineReader());
+const isOngoing = ref(false);
 
 const getDevices = async () => {
   const devices = await navigator.serial.getPorts();
   if (devices) {
     devicesList.value = devices;
+    devicesInfo.value = devices.map((device) => device.getInfo());
   } else {
     console.error("No devices found", devices);
   }
 };
 
+const stopSerial = async () => {
+  isOngoing.value = false;
+
+  if (selectedDevice.value !== null) {
+    const device = devicesList.value[selectedDevice.value];
+    await reader.value.releaseLock();
+    await device.close();
+  }
+};
+
+const startSerial = async () => {
+  isOngoing.value = true;
+
+  if (selectedDevice.value !== null) {
+    const device = devicesList.value[selectedDevice.value];
+    await device.open({ baudRate: 9600 });
+
+    while (device.readable) {
+      reader.value = device.readable.getReader();
+
+      lineReader.value.setReader(reader.value);
+      lineReader.value.clearBuffer();
+
+      try {
+        await lineReader.value.read();
+      } catch (error) {
+        // TODO: Handle non-fatal read error.
+        console.error(error);
+      }
+    }
+  }
+};
+
 onMounted(() => {
+  lineReader.value.addListener((line) => {
+    console.log(line);
+  });
+
   getDevices();
 });
 </script>
