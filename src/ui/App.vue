@@ -3,18 +3,21 @@
   <v-divider style="margin: 1em 0" />
   <Chart :data="sensorData" />
   <LatestValue :value="latestReading" @save="handleSave" />
+  <ValuesTable :items="sensorDataTabular" />
 </template>
 
 <script setup>
-import { ref, shallowRef } from "vue";
+import { ref, shallowRef, computed } from "vue";
 import SerialSelector from "./SerialSelector.vue";
 import Chart from "./Chart.vue";
 import LatestValue from "./LatestValue.vue";
+import ValuesTable from "./ValuesTable.vue";
 
 const sensorData = shallowRef({
   labels: [],
   values: [],
 });
+const sensorDataTabular = ref([]);
 const latestReading = ref(null);
 const initialTime = ref(null);
 
@@ -29,6 +32,7 @@ const onData = (data) => {
     labels: [...sensorData.value.labels, time],
     values: [...sensorData.value.values, data],
   };
+  sensorDataTabular.value.push({ time, value: data });
   latestReading.value = data;
 };
 
