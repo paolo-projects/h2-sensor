@@ -5,14 +5,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, shallowRef, useTemplateRef, watch } from "vue";
+import { onMounted, shallowRef, useTemplateRef, watch } from "vue";
 import Chart from "chart.js/auto";
 
 const chartRef = useTemplateRef("chart-canvas");
 
 const props = defineProps({
   data: {
-    type: Array,
+    type: Object,
     required: true,
   },
 });
@@ -23,11 +23,11 @@ onMounted(() => {
   chart.value = new Chart(chartRef.value, {
     type: "line",
     data: {
-      labels: props.data.map((_, index) => index),
+      labels: props.data.labels,
       datasets: [
         {
           label: "ADC Value",
-          data: props.data,
+          data: props.data.values,
           borderWidth: 1,
           fill: false,
         },
@@ -52,8 +52,8 @@ watch(
   () => props.data,
   (newData) => {
     if (chart.value) {
-      chart.value.data.labels = newData.map((_, index) => index);
-      chart.value.data.datasets[0].data = newData;
+      chart.value.data.labels = newData.labels;
+      chart.value.data.datasets[0].data = newData.values;
       chart.value.update();
     }
   }

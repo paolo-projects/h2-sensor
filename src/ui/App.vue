@@ -2,7 +2,7 @@
   <SerialSelector @sensorData="onData" />
   <v-divider style="margin: 1em 0" />
   <Chart :data="sensorData" />
-  <LatestValue :value="latestReading" />
+  <LatestValue :value="latestReading" @save="handleSave" />
 </template>
 
 <script setup>
@@ -11,11 +11,28 @@ import SerialSelector from "./SerialSelector.vue";
 import Chart from "./Chart.vue";
 import LatestValue from "./LatestValue.vue";
 
-const sensorData = shallowRef([]);
+const sensorData = shallowRef({
+  labels: [],
+  values: [],
+});
 const latestReading = ref(null);
+const initialTime = ref(null);
 
 const onData = (data) => {
-  sensorData.value = [].concat(sensorData.value, data);
+  const nowTime = Date.now();
+
+  if (sensorData.value.labels.length == 0) {
+    initialTime.value = nowTime;
+  }
+  const time = (nowTime - initialTime.value) / 1000;
+  sensorData.value = {
+    labels: [...sensorData.value.labels, time],
+    values: [...sensorData.value.values, data],
+  };
   latestReading.value = data;
+};
+
+const handleSave = async () => {
+  await electronAPI.saveData(sensorData.value);
 };
 </script>

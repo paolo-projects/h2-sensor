@@ -3,7 +3,6 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 
-console.log("preload script gets executed");
 contextBridge.exposeInMainWorld("electronAPI", {
-  devicesList: () => ipcRenderer.invoke("devices-list"),
+  saveData: (data) => ipcRenderer.invoke("save-data", data),
 });
