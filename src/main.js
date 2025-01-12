@@ -17,20 +17,22 @@ const createWindow = () => {
     },
   });
 
-  mainWindow.webContents.session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
-    if (permission === 'serial') {
-      return true
-    }
+  mainWindow.webContents.session.setPermissionCheckHandler(
+    (webContents, permission, requestingOrigin, details) => {
+      if (permission === "serial") {
+        return true;
+      }
 
-    return false
-  });
+      return false;
+    }
+  );
 
   mainWindow.webContents.session.setDevicePermissionHandler((details) => {
-    if (details.deviceType === 'serial') {
-      return true
+    if (details.deviceType === "serial") {
+      return true;
     }
 
-    return false
+    return false;
   });
 
   // and load the index.html of the app.

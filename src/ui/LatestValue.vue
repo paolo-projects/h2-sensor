@@ -1,6 +1,14 @@
 <template>
   <div class="latest-value">
-    <p>Latest Value: <input type="text" readonly :value="props.value" /></p>
+    <p>
+      Latest Value:
+      <v-text-field
+        type="text"
+        variant="outlined"
+        readonly
+        :value="props.value"
+      />
+    </p>
   </div>
 </template>
 <script setup>

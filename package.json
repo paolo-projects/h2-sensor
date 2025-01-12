@@ -21,6 +21,7 @@
     "@electron-forge/plugin-fuses": "^7.6.0",
     "@electron-forge/plugin-vite": "^7.6.0",
     "@electron/fuses": "^1.8.0",
+    "@mdi/font": "^7.4.47",
     "@vitejs/plugin-vue": "^5.2.1",
     "electron": "33.3.1",
     "vite": "^5.4.11"
@@ -32,6 +33,7 @@
     "@serialport/parser-readline": "^13.0.0",
     "chart.js": "^4.4.7",
     "electron-squirrel-startup": "^1.0.1",
-    "vue": "^3.5.13"
+    "vue": "^3.5.13",
+    "vuetify": "^3.7.6"
   }
 }

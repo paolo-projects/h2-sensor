@@ -1,5 +1,6 @@
 <template>
   <SerialSelector @sensorData="onData" />
+  <v-divider style="margin: 1em 0" />
   <Chart :data="sensorData" />
   <LatestValue :value="latestReading" />
 </template>
