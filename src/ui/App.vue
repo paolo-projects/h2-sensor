@@ -28,9 +28,13 @@ const onData = (data) => {
     initialTime.value = nowTime;
   }
   const time = (nowTime - initialTime.value) / 1000;
+
+  sensorData.value.labels.push(time);
+  sensorData.value.values.push(data);
+
   sensorData.value = {
-    labels: [...sensorData.value.labels, time],
-    values: [...sensorData.value.values, data],
+    labels: sensorData.value.labels,
+    values: sensorData.value.values,
   };
   sensorDataTabular.value.push({ time, value: data });
   latestReading.value = data;
