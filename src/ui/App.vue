@@ -1,9 +1,25 @@
 <template>
-  <SerialSelector @sensorData="onData" />
-  <v-divider style="margin: 1em 0" />
-  <Chart :data="sensorData" />
-  <LatestValue :value="latestReading" @save="handleSave" />
-  <ValuesTable :items="sensorDataTabular" />
+  <v-theme-provider class="pa-10" theme="dark" with-background>
+    <SerialSelector @sensorData="onData" />
+    <LatestValue
+      :value="latestReading"
+      @save="handleSave"
+      style="margin: 1em 0"
+    />
+    <v-divider style="margin: 1em 0" />
+    <v-tabs v-model="currentTab">
+      <v-tab>Chart</v-tab>
+      <v-tab>Table</v-tab>
+    </v-tabs>
+    <v-tabs-window v-model="currentTab" style="padding: 1em">
+      <v-tabs-window-item :value="0">
+        <Chart :data="sensorData" />
+      </v-tabs-window-item>
+      <v-tabs-window-item :value="1">
+        <ValuesTable :items="sensorDataTabular" />
+      </v-tabs-window-item>
+    </v-tabs-window>
+  </v-theme-provider>
 </template>
 
 <script setup>
@@ -13,6 +29,7 @@ import Chart from "./Chart.vue";
 import LatestValue from "./LatestValue.vue";
 import ValuesTable from "./ValuesTable.vue";
 
+const currentTab = ref(0);
 const sensorData = shallowRef({
   labels: [],
   values: [],

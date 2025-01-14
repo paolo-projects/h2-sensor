@@ -37,6 +37,12 @@ import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import "@mdi/font/css/materialdesignicons.css"; // Ensure you are using css-loader
 
+import { Chart } from "chart.js";
+import zoomPlugin from "chartjs-plugin-zoom";
+
+Chart.register(zoomPlugin);
+Chart.defaults.borderColor = "#333333";
+
 const vuetify = createVuetify({
   components,
   directives,

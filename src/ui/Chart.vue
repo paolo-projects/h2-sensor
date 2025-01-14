@@ -30,18 +30,36 @@ onMounted(() => {
           data: props.data.values,
           borderWidth: 1,
           fill: false,
+          borderColor: "#999999",
+          backgroundColor: "#666666",
         },
       ],
     },
     options: {
       animation: false,
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: {
           display: false,
         },
         tooltip: {
           enabled: true,
+        },
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: "y",
+          },
+          zoom: {
+            mode: "y",
+            wheel: {
+              enabled: true,
+            },
+            pinch: {
+              enabled: true,
+            },
+          },
         },
       },
     },
