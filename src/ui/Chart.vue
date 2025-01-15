@@ -36,7 +36,7 @@ onMounted(() => {
       datasets: [
         {
           label: "ADC Value",
-          data: props.data,
+          data: props.data.data,
           borderWidth: 1,
           fill: false,
           borderColor: "#999999",
@@ -90,7 +90,7 @@ watch(
   () => props.data,
   (newData) => {
     if (chart.value) {
-      chart.value.data.datasets[0].data = newData;
+      chart.value.data.datasets[0].data = newData.data;
       chart.value.update();
     }
   }

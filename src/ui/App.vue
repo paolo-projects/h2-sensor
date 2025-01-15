@@ -36,13 +36,13 @@ import LatestValue from "./LatestValue.vue";
 import ValuesTable from "./ValuesTable.vue";
 
 const currentTab = ref(0);
-const sensorData = shallowRef([]);
+const sensorData = shallowRef({ data: [] });
 const sensorDataTabular = ref([]);
 const latestReading = ref(null);
 const initialTime = ref(null);
 
 const onClearData = () => {
-  sensorData.value = [];
+  sensorData.value = { data: [] };
   sensorDataTabular.value = [];
   latestReading.value = null;
 };
@@ -50,12 +50,13 @@ const onClearData = () => {
 const onData = (data) => {
   const nowTime = Date.now();
 
-  if (sensorData.value.length == 0) {
+  if (sensorData.value.data.length == 0) {
     initialTime.value = nowTime;
   }
   const time = (nowTime - initialTime.value) / 1000;
 
-  sensorData.value = sensorData.value.concat({ x: time, y: data });
+  sensorData.value.data.push({ x: time, y: data });
+  sensorData.value = { data: sensorData.value.data };
   sensorDataTabular.value.push({ time, value: data });
   latestReading.value = data;
 };
