@@ -10,20 +10,15 @@ if (started) {
 }
 
 const handleSaveData = async (event, data) => {
-  if (data && data.values.length > 0) {
+  if (data && data.length > 0) {
     const { filePath } = await dialog.showSaveDialog({
       defaultPath: "data.csv",
     });
 
     if (filePath) {
-      const records = data.values.map((value, index) => ({
-        Time: data.labels[index],
-        "ADC Value": value,
-      }));
-
-      const output = stringify(records, {
+      const output = stringify(data, {
         header: true,
-        columns: ["Time", "ADC Value"],
+        columns: ["time", "value"],
       });
 
       await fs.writeFile(filePath, output);

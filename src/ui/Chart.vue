@@ -31,13 +31,12 @@ const isZoomed = ref(false);
 
 onMounted(() => {
   chart.value = new Chart(chartRef.value, {
-    type: "line",
+    type: "scatter",
     data: {
-      labels: props.data.labels,
       datasets: [
         {
           label: "ADC Value",
-          data: props.data.values,
+          data: props.data,
           borderWidth: 1,
           fill: false,
           borderColor: "#999999",
@@ -49,6 +48,7 @@ onMounted(() => {
       animation: false,
       responsive: true,
       maintainAspectRatio: false,
+      showLine: true,
       plugins: {
         legend: {
           display: false,
@@ -90,8 +90,7 @@ watch(
   () => props.data,
   (newData) => {
     if (chart.value) {
-      chart.value.data.labels = newData.labels;
-      chart.value.data.datasets[0].data = newData.values;
+      chart.value.data.datasets[0].data = newData;
       chart.value.update();
     }
   }

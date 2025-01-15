@@ -29,23 +29,20 @@
 </template>
 
 <script setup>
-import { ref, shallowRef, computed } from "vue";
+import { ref, shallowRef } from "vue";
 import SerialSelector from "./SerialSelector.vue";
 import Chart from "./Chart.vue";
 import LatestValue from "./LatestValue.vue";
 import ValuesTable from "./ValuesTable.vue";
 
 const currentTab = ref(0);
-const sensorData = shallowRef({
-  labels: [],
-  values: [],
-});
+const sensorData = shallowRef([]);
 const sensorDataTabular = ref([]);
 const latestReading = ref(null);
 const initialTime = ref(null);
 
 const onClearData = () => {
-  sensorData.value = { labels: [], values: [] };
+  sensorData.value = [];
   sensorDataTabular.value = [];
   latestReading.value = null;
 };
@@ -53,23 +50,22 @@ const onClearData = () => {
 const onData = (data) => {
   const nowTime = Date.now();
 
-  if (sensorData.value.labels.length == 0) {
+  if (sensorData.value.length == 0) {
     initialTime.value = nowTime;
   }
   const time = (nowTime - initialTime.value) / 1000;
 
-  sensorData.value.labels.push(time);
-  sensorData.value.values.push(data);
-
-  sensorData.value = {
-    labels: sensorData.value.labels,
-    values: sensorData.value.values,
-  };
+  sensorData.value = sensorData.value.concat({ x: time, y: data });
   sensorDataTabular.value.push({ time, value: data });
   latestReading.value = data;
 };
 
 const handleSave = async () => {
-  await electronAPI.saveData(sensorData.value);
+  await electronAPI.saveData(
+    sensorDataTabular.value.map((d) => ({
+      time: d.time,
+      value: d.value,
+    }))
+  );
 };
 </script>
