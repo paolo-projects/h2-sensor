@@ -115,6 +115,9 @@ const startSerial = async () => {
 
 onMounted(() => {
   lineReader.value.addListener((line) => {
+    if (line.indexOf("U12:") === -1) {
+      return;
+    }
     const u12 = Number(line.substring(line.indexOf("U12:") + 4));
     emits("sensorData", u12);
   });

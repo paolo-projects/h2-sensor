@@ -14,17 +14,10 @@
 </template>
 
 <script setup>
-import { onMounted, shallowRef, useTemplateRef, watch, ref } from "vue";
+import { onMounted, shallowRef, useTemplateRef, ref } from "vue";
 import Chart from "chart.js/auto";
 
 const chartRef = useTemplateRef("chart-canvas");
-
-const props = defineProps({
-  data: {
-    type: Object,
-    required: true,
-  },
-});
 
 const chart = shallowRef(null);
 const isZoomed = ref(false);
@@ -36,7 +29,7 @@ onMounted(() => {
       datasets: [
         {
           label: "ADC Value",
-          data: props.data.data,
+          data: [],
           borderWidth: 1,
           fill: false,
           borderColor: "#999999",
@@ -86,20 +79,38 @@ onMounted(() => {
   });
 });
 
-watch(
-  () => props.data,
-  (newData) => {
-    if (chart.value) {
-      chart.value.data.datasets[0].data = newData.data;
-      chart.value.update();
-    }
+const setData = (data) => {
+  if (chart.value) {
+    chart.value.data.datasets[0].data = data;
+    chart.value.update();
   }
-);
+};
+
+const pushData = (...data) => {
+  if (chart.value) {
+    chart.value.data.datasets[0].data.push(...data);
+    chart.value.update();
+  }
+};
+
+const clearData = () => {
+  if (chart.value) {
+    chart.value.data.datasets[0].data = [];
+    chart.value.update();
+  }
+};
 
 const restoreZoomPan = () => {
   chart.value.resetZoom();
   isZoomed.value = false;
 };
+
+defineExpose({
+  setData,
+  pushData,
+  clearData,
+  restoreZoomPan,
+});
 </script>
 <style scoped>
 .chart-container {

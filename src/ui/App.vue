@@ -4,9 +4,6 @@
       <v-card-text>
         <SerialSelector @sensorData="onData" @clearData="onClearData" />
         <LatestValue :value="latestReading" style="margin: 1em 0" />
-        <v-btn @click="handleSave" variant="outlined" color="primary"
-          >Export data</v-btn
-        >
       </v-card-text>
     </v-card>
     <v-card style="margin: 1em 0 0 0">
@@ -17,55 +14,58 @@
         </v-tabs>
         <v-tabs-window v-model="currentTab" style="padding: 1em">
           <v-tabs-window-item :value="0">
-            <Chart :data="sensorData" />
+            <Chart ref="chart-component" />
           </v-tabs-window-item>
           <v-tabs-window-item :value="1">
-            <ValuesTable :items="sensorDataTabular" />
+            <ValuesTable :items="sensorData" />
           </v-tabs-window-item>
         </v-tabs-window>
+        <v-btn @click="handleSave" variant="outlined" color="primary"
+          >Export data</v-btn
+        >
       </v-card-text>
     </v-card>
   </v-theme-provider>
 </template>
 
 <script setup>
-import { ref, shallowRef } from "vue";
+import { ref, shallowReactive, useTemplateRef } from "vue";
 import SerialSelector from "./SerialSelector.vue";
 import Chart from "./Chart.vue";
 import LatestValue from "./LatestValue.vue";
 import ValuesTable from "./ValuesTable.vue";
 
 const currentTab = ref(0);
-const sensorData = shallowRef({ data: [] });
-const sensorDataTabular = ref([]);
+const sensorData = shallowReactive([]);
 const latestReading = ref(null);
 const initialTime = ref(null);
 
+const chartComponent = useTemplateRef("chart-component");
+
 const onClearData = () => {
-  sensorData.value = { data: [] };
-  sensorDataTabular.value = [];
+  sensorData.splice(0, sensorData.length);
+  chartComponent.value.clearData();
   latestReading.value = null;
 };
 
 const onData = (data) => {
   const nowTime = Date.now();
 
-  if (sensorData.value.data.length == 0) {
+  if (sensorData.length == 0) {
     initialTime.value = nowTime;
   }
   const time = (nowTime - initialTime.value) / 1000;
 
-  sensorData.value.data.push({ x: time, y: data });
-  sensorData.value = { data: sensorData.value.data };
-  sensorDataTabular.value.push({ time, value: data });
+  sensorData.push({ x: time, y: data });
+  chartComponent.value.pushData({ x: time, y: data });
   latestReading.value = data;
 };
 
 const handleSave = async () => {
   await electronAPI.saveData(
-    sensorDataTabular.value.map((d) => ({
-      time: d.time,
-      value: d.value,
+    sensorData.map((d) => ({
+      time: d.x,
+      value: d.y,
     }))
   );
 };

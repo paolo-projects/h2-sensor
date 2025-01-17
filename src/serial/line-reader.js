@@ -10,8 +10,6 @@ export default class SerialPortLineReader {
   }
 
   checkBuffer() {
-    const textDecoder = new TextDecoder("utf-8");
-
     for (let i = 0; i < this.buffer.length - this.delimiter.length + 1; i++) {
       const candidate = uint8arrayToStringMethod(
         this.buffer.slice(i, i + this.delimiter.length)
