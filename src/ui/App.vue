@@ -1,5 +1,5 @@
 <template>
-  <v-theme-provider class="pa-10" theme="dark" with-background>
+  <v-theme-provider theme="dark" with-background>
     <v-card>
       <v-card-text>
         <SerialSelector @sensorData="onData" @clearData="onClearData" />
