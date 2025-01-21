@@ -4,6 +4,5 @@
 import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld("electronAPI", {
-  saveData: (data) => ipcRenderer.invoke("save-data", data),
-  openTable: (data) => ipcRenderer.invoke("open-table", data),
+  fetchData: () => ipcRenderer.invoke("fetch-data"),
 });

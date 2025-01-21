@@ -86,6 +86,14 @@ const setData = (data) => {
   }
 };
 
+const getData = () => {
+  return chart.value ? chart.value.data.datasets[0].data : [];
+};
+
+const getDataLength = () => {
+  return chart.value ? chart.value.data.datasets[0].data.length : 0;
+};
+
 const pushData = (...data) => {
   if (chart.value) {
     chart.value.data.datasets[0].data.push(...data);
@@ -107,6 +115,8 @@ const restoreZoomPan = () => {
 
 defineExpose({
   setData,
+  getData,
+  getDataLength,
   pushData,
   clearData,
   restoreZoomPan,

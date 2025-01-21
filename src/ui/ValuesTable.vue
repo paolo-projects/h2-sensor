@@ -18,8 +18,8 @@ const props = defineProps({
 });
 
 const headers = [
-  { key: "time", title: "Time (s)", value: "x", sortable: true },
-  { key: "value", title: "ADC Value", value: "y", sortable: true },
+  { key: "time", title: "Time (s)", value: "time", sortable: true },
+  { key: "value", title: "ADC Value", value: "value", sortable: true },
 ];
 
 const sortBy = ref([{ key: "time", order: "desc" }]);
@@ -34,7 +34,7 @@ watch(
 <style scoped>
 .table-container {
   margin: 1em 0;
-  height: 400px;
+  height: 85vh;
   overflow-y: scroll;
 }
 </style>

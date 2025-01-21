@@ -10,18 +10,21 @@
       <v-card-text>
         <v-tabs v-model="currentTab">
           <v-tab>Chart</v-tab>
-          <v-tab>Table</v-tab>
         </v-tabs>
         <v-tabs-window v-model="currentTab" style="padding: 1em">
           <v-tabs-window-item :value="0">
             <Chart ref="chart-component" />
           </v-tabs-window-item>
-          <v-tabs-window-item :value="1">
-            <ValuesTable :items="sensorData" />
-          </v-tabs-window-item>
         </v-tabs-window>
         <v-btn @click="handleSave" variant="outlined" color="primary"
           >Export data</v-btn
+        >
+        <v-btn
+          @click="handleTable"
+          variant="outlined"
+          color="warning"
+          class="ml-1"
+          >Tabular data</v-btn
         >
       </v-card-text>
     </v-card>
@@ -36,14 +39,12 @@ import LatestValue from "./LatestValue.vue";
 import ValuesTable from "./ValuesTable.vue";
 
 const currentTab = ref(0);
-const sensorData = shallowReactive([]);
 const latestReading = ref(null);
 const initialTime = ref(null);
 
 const chartComponent = useTemplateRef("chart-component");
 
 const onClearData = () => {
-  sensorData.splice(0, sensorData.length);
   chartComponent.value.clearData();
   latestReading.value = null;
 };
@@ -51,22 +52,29 @@ const onClearData = () => {
 const onData = (data) => {
   const nowTime = Date.now();
 
-  if (sensorData.length == 0) {
+  if (chartComponent.value.getDataLength() == 0) {
     initialTime.value = nowTime;
   }
   const time = (nowTime - initialTime.value) / 1000;
 
-  sensorData.push({ x: time, y: data });
   chartComponent.value.pushData({ x: time, y: data });
   latestReading.value = data;
 };
 
 const handleSave = async () => {
   await electronAPI.saveData(
-    sensorData.map((d) => ({
+    chartComponent.value.getData().map((d) => ({
       time: d.x,
       value: d.y,
     }))
   );
+};
+
+const handleTable = async () => {
+  const tableData = chartComponent.value.getData().map((d) => ({
+    time: d.x,
+    value: d.y,
+  }));
+  await electronAPI.openTable(tableData);
 };
 </script>
